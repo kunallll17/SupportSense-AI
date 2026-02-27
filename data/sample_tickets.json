@@ -1,0 +1,227 @@
+[
+    {
+        "title": "Cannot log in after password reset",
+        "description": "User reset password via email link but login still fails with 'Invalid credentials'. Tried incognito mode and cleared all cookies. Happens on Chrome and Firefox. Account is enterprise SSO-linked.",
+        "customer_tier": "enterprise",
+        "issue_type": "authentication",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Session token cache was not invalidated after password reset. Fixed by force-expiring all active sessions for the user via admin panel."
+    },
+    {
+        "title": "Payment gateway returning 504 timeout on checkout",
+        "description": "Customers are getting 504 Gateway Timeout on /api/checkout/pay. Consistently fails for orders above $500. Stripe webhook logs show no events received. Issue started approximately 3 hours ago.",
+        "customer_tier": "enterprise",
+        "issue_type": "payment",
+        "severity": "P1",
+        "status": "resolved",
+        "resolution_notes": "Stripe API endpoint had a regional outage. Switched to backup payment processor temporarily. Full recovery after Stripe restored service."
+    },
+    {
+        "title": "Dashboard not loading — blank white screen",
+        "description": "After logging in, dashboard shows blank white screen. Browser console shows: 'TypeError: Cannot read property of undefined at DashboardComponent.js:47'. Affecting multiple users in the same organization.",
+        "customer_tier": "pro",
+        "issue_type": "ui_bug",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Null check missing for user.preferences object when permissions are not yet synced. Deployed hotfix v2.3.1."
+    },
+    {
+        "title": "API rate limit hit despite being within quota",
+        "description": "Getting 429 Too Many Requests errors even though usage dashboard shows we are at 40% of our monthly quota. Rate limiting seems to be per-minute not per-month. Documentation is unclear.",
+        "customer_tier": "pro",
+        "issue_type": "api",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "Clarified in docs: rate limits are concurrent-request based (100 req/min), not monthly. Customer updated their retry logic with exponential backoff."
+    },
+    {
+        "title": "CSV export contains corrupted data — UTF-8 encoding issue",
+        "description": "Exporting customer data to CSV produces garbled characters for names with accents (é, ü, ñ). Opening in Excel shows question marks. The data looks correct in the UI. Only affects CSV, not JSON export.",
+        "customer_tier": "pro",
+        "issue_type": "data_export",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "CSV export was missing BOM header for Excel UTF-8 compatibility. Fixed encoding to UTF-8-BOM in the export service."
+    },
+    {
+        "title": "SSO login loop — redirect keeps cycling",
+        "description": "Users authenticating via Okta SSO are stuck in an infinite redirect loop. The IdP responds successfully but the app keeps redirecting back to SSO login. Only affects users in the EU region.",
+        "customer_tier": "enterprise",
+        "issue_type": "authentication",
+        "severity": "P1",
+        "status": "resolved",
+        "resolution_notes": "Cookie SameSite=Strict policy blocked session cookie from being set cross-origin during SAML redirect. Changed to SameSite=Lax for auth cookies."
+    },
+    {
+        "title": "Webhook events not being delivered",
+        "description": "Webhook endpoint configured correctly (verified with ngrok). Events show as 'delivered' in our dashboard but the target server receives nothing. Started after we updated the webhook URL two days ago.",
+        "customer_tier": "pro",
+        "issue_type": "api",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Old webhook URL was cached in the queue worker. Required cache flush and re-registration of the webhook endpoint. Events began delivering immediately after."
+    },
+    {
+        "title": "Mobile app crashes on launch — iOS 18",
+        "description": "App crashes immediately after splash screen on iOS 18.1 devices. Works fine on iOS 17. Crash report shows EXC_BAD_ACCESS in AVFoundation framework. Does not affect Android.",
+        "customer_tier": "free",
+        "issue_type": "mobile_crash",
+        "severity": "P2",
+        "status": "escalated",
+        "resolution_notes": "Identified incompatibility with iOS 18 background app refresh API. Fix in progress, targeting v4.2.0 release."
+    },
+    {
+        "title": "Data not syncing between web and mobile apps",
+        "description": "Changes made on the web dashboard are not reflected in the mobile app even after force-refresh. Sync seems to work in the opposite direction (mobile to web). Issue started after the v4.1 mobile release.",
+        "customer_tier": "enterprise",
+        "issue_type": "sync",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "WebSocket subscription for mobile clients was not re-established after the v4.1 protocol change. Fixed in v4.1.2 patch."
+    },
+    {
+        "title": "Cannot invite team members — email invite not received",
+        "description": "Sent team invitations to 5 email addresses, none received the invite email. Checked spam folders. Our email domain is whitelisted. The invitation shows as 'Sent' in the admin panel.",
+        "customer_tier": "pro",
+        "issue_type": "email_delivery",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "SendGrid API key had expired. Rotated key and re-queued pending invites. All emails delivered successfully."
+    },
+    {
+        "title": "Elasticsearch query timeout on large datasets",
+        "description": "Search queries are timing out (30s) when the dataset has more than 1 million records. Smaller datasets work fine. We need to search across all historical records for compliance.",
+        "customer_tier": "enterprise",
+        "issue_type": "performance",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Added pagination with search_after for deep pagination. Enabled index sorting on created_at field. Query time reduced to under 2s."
+    },
+    {
+        "title": "2FA OTP codes not working",
+        "description": "OTP codes from Google Authenticator are being rejected. Codes are entered within the 30-second window. This started happening for several users today. SMS-based 2FA works fine.",
+        "customer_tier": "pro",
+        "issue_type": "authentication",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Server clock drifted by 90 seconds causing TOTP validation to fail (window is ±30s). Fixed by syncing server time via NTP and adding 1-step clock tolerance."
+    },
+    {
+        "title": "PDF reports generating with wrong date range",
+        "description": "Monthly PDF reports are showing data for the previous month instead of the selected month. The in-app charts show correct data. Issue only affects the PDF download, not the email-attached reports.",
+        "customer_tier": "free",
+        "issue_type": "reporting",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "Timezone was not being passed to the PDF generation service. It was defaulting to UTC while the UI used the user's local timezone. Fixed by passing timezone explicitly."
+    },
+    {
+        "title": "Billing page shows incorrect subscription plan",
+        "description": "After upgrading from Pro to Enterprise plan, the billing page still shows 'Pro Plan' and the Enterprise features are not enabled. The charge on the credit card was for Enterprise pricing.",
+        "customer_tier": "enterprise",
+        "issue_type": "billing",
+        "severity": "P1",
+        "status": "resolved",
+        "resolution_notes": "Plan upgrade webhook from Stripe was not processed due to a race condition with the subscription update endpoint. Manually triggered plan sync. Added idempotency key to webhook handler."
+    },
+    {
+        "title": "File uploads failing for files over 10MB",
+        "description": "Uploading files larger than 10MB returns a 413 Payload Too Large error. Our plan supports up to 100MB uploads according to the pricing page. Smaller files upload without issue.",
+        "customer_tier": "pro",
+        "issue_type": "file_upload",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "Nginx reverse proxy had a default 10MB body size limit that was not overridden by our application config. Updated nginx config to allow 100MB uploads."
+    },
+    {
+        "title": "Login fails intermittently — works every other attempt",
+        "description": "Login succeeds on the first attempt, fails on the second, succeeds on the third. Predictably alternating. Only happens from the office network, works fine on mobile data.",
+        "customer_tier": "pro",
+        "issue_type": "authentication",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Load balancer was routing requests across two nodes where one had a stale session store. Fixed by enabling sticky sessions on the load balancer for auth endpoints."
+    },
+    {
+        "title": "Reports dashboard loads slowly — 45 second load time",
+        "description": "The analytics dashboard takes 45+ seconds to load. Browser Network tab shows a single API call to /api/analytics/report taking the full time. Other pages are fast. Started after adding 6 months of historical data.",
+        "customer_tier": "enterprise",
+        "issue_type": "performance",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Missing composite index on (user_id, created_at) was causing a full table scan. Added index and implemented Redis caching for aggregated report data with 5-minute TTL."
+    },
+    {
+        "title": "OAuth token refresh failing silently",
+        "description": "Our integration stops working after 1 hour (OAuth access token lifetime). The refresh token call is made but returns 400 with 'invalid_grant'. Token was working yesterday.",
+        "customer_tier": "pro",
+        "issue_type": "api",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Refresh tokens are single-use and were being stored incorrectly — same refresh token used twice. Fixed token rotation logic to always store the new refresh token returned."
+    },
+    {
+        "title": "Custom domain SSL certificate expired",
+        "description": "Our custom domain returns SSL_ERROR_RX_RECORD_TOO_LONG in browser. The auto-renewal for the Let's Encrypt certificate appears to have failed silently 3 days ago. Site is inaccessible to all users.",
+        "customer_tier": "enterprise",
+        "issue_type": "infrastructure",
+        "severity": "P1",
+        "status": "resolved",
+        "resolution_notes": "Let's Encrypt ACME challenge was failing due to a CAA DNS record mismatch. Corrected DNS records and manually triggered cert renewal. Certificate renewed in under 5 minutes."
+    },
+    {
+        "title": "Search returns no results for exact product name",
+        "description": "Searching for 'MacBook Pro 14' returns zero results even though we have 47 products with this exact name. Fuzzy search with partial terms works. This broke after we migrated to the new search backend.",
+        "customer_tier": "free",
+        "issue_type": "search",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "New search backend used a stemming analyzer that normalized 'MacBook' differently. Added keyword mapping for product names alongside the analyzed text field."
+    },
+    {
+        "title": "Notifications not sending after account migration",
+        "description": "Since migrating from our old account to the new organization account, no push notifications are being sent. Mobile tokens were transferred but notifications show as 'delivered' in logs without reaching devices.",
+        "customer_tier": "pro",
+        "issue_type": "notifications",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "FCM/APNs tokens were migrated but the org-level notification channels were not reconfigured. Reconfigured push certificates under the new org account."
+    },
+    {
+        "title": "Payments failing for international cards",
+        "description": "Payment fails specifically for non-US cards (tested with UK, Indian, and German cards). US cards work fine. Error: 'card_declined' but the cards are valid and have sufficient funds. SCA flow not appearing.",
+        "customer_tier": "pro",
+        "issue_type": "payment",
+        "severity": "P2",
+        "status": "escalated",
+        "resolution_notes": "Stripe 3D Secure / SCA flow was not being triggered for international cards due to missing return_url in payment intent. Fix deployed."
+    },
+    {
+        "title": "Bulk import fails silently for more than 500 rows",
+        "description": "CSV bulk import works for files under 500 rows. For larger files, the UI shows 'Import Successful' but only the first 500 rows appear in the system. No error is shown or logged.",
+        "customer_tier": "enterprise",
+        "issue_type": "data_import",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "Database batch insert had a hardcoded LIMIT of 500 rows left from early development. Removed limit and implemented chunked inserts with progress tracking."
+    },
+    {
+        "title": "User roles not persisting after re-login",
+        "description": "Admin assigns roles (Editor, Viewer) to team members. Roles appear correct until the user logs out and back in — then they revert to default 'Viewer' role. Session seems to override database roles.",
+        "customer_tier": "pro",
+        "issue_type": "permissions",
+        "severity": "P2",
+        "status": "resolved",
+        "resolution_notes": "JWT token was generated at login with roles baked in. Token was not refreshed after role changes. Fixed by adding role re-fetch on each session refresh instead of caching in JWT."
+    },
+    {
+        "title": "Automated email reports not running on schedule",
+        "description": "Weekly email reports that were previously sent every Monday at 9am have stopped. Last successful run was 3 weeks ago. The schedule is configured correctly in settings and has not changed.",
+        "customer_tier": "free",
+        "issue_type": "scheduled_jobs",
+        "severity": "P3",
+        "status": "resolved",
+        "resolution_notes": "Celery beat scheduler had its database entry corrupted after a server restart. Re-registered the periodic task. Reports resumed on the next scheduled run."
+    }
+]
