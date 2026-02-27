@@ -101,7 +101,6 @@ New Ticket (POST /triage)
 ```bash
 # Clone and create virtual environment
 git clone <repo>
-cd Elasticsearch_hackathon
 python -m venv venv
 venv\Scripts\activate        # Windows
 # source venv/bin/activate   # Linux/Mac
